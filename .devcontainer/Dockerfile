@@ -9,8 +9,6 @@ RUN JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::") && \
     echo "JAVA_HOME=$JAVA_HOME" >> /etc/environment && \
     echo "export JAVA_HOME" >> /etc/profile
 
-# Install PySpark
-RUN pip install pyspark
 
 # Create a non-root user called 'developer' and give them sudo privileges
 RUN useradd -m developer && \
@@ -22,3 +20,10 @@ WORKDIR /workspace
 
 # Change to non-root privilege
 USER developer
+
+# Installing poetry
+ENV POETRY_HOME=/home/developer/poetry
+RUN python3 -m venv $POETRY_HOME && \
+    . $POETRY_HOME/bin/activate && \
+    pip install poetry
+ENV PATH="$POETRY_HOME/bin:$PATH"

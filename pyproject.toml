@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "thundera"
+version = "0.1.0"
+description = "Data quality library"
+authors = ["Henrique Magalhães Soares <hemagso@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pyspark = "^3.5.1"
+
+[tool.poetry.group.dev.dependencies]
+flake8 = "^7.0.0"
+pytest = "^8.1.1"
+mypy = "^1.9.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
