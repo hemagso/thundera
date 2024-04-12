@@ -1,0 +1,19 @@
+{
+    "name": "Pyspark",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python"
+            ]
+        }
+    },
+    "forwardPorts": [
+        8888,
+        4040
+    ],
+    "postCreateCommand": "echo 'Environment ready!'",
+    "remoteUser": "developer"
+}
