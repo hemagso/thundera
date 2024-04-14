@@ -18,9 +18,9 @@ def parse_range(range: str) -> dict:
     include_start = open_range == "["
     include_end = close_range == "]"
 
-    start, end = (item.strip() for item in range.split(","))
-    start = float("-inf") if start == "-inf" else float(start)
-    end = float("inf") if end in ("inf", "+inf") else float(end)
+    start_str, end_str = (item.strip() for item in range.split(","))
+    start = float("-inf") if start_str == "-inf" else float(start_str)
+    end = float("inf") if end_str in ("inf", "+inf") else float(end_str)
 
     return {
         "start": start, 
