@@ -1,7 +1,9 @@
-from pyspark.sql import DataFrame, Column
-from pyspark.sql.functions import lit
-from .metadata import Domain, RangeDomain, SingleDomain, AttributeField
 from typing import Callable
+
+from pyspark.sql import Column, DataFrame
+from pyspark.sql.functions import lit
+
+from .metadata import AttributeField, Domain, RangeDomain, SingleDomain
 
 DomainValidator = Callable[[Column], Column]
 

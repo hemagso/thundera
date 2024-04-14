@@ -1,6 +1,7 @@
+from typing import Annotated, Literal, Self
+
 from pydantic import BaseModel, Field, model_validator
-from typing import Literal, Annotated
-from typing import  Self
+
 
 def parse_range(range: str) -> dict:
     range = range.strip()
