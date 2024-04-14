@@ -25,6 +25,7 @@ share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+poetry.lock
 
 # PyInstaller
 # Usually these files are written by a python script from a template
@@ -117,3 +118,6 @@ celerybeat.pid
 
 # Pyre type checker
 .pyre/
+
+# vscode stuff
+.vscode
