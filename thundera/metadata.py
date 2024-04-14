@@ -1,8 +1,6 @@
-from pydantic import BaseModel, Field, model_validator, field_validator
+from pydantic import BaseModel, Field, model_validator
 from typing import Literal, Annotated
-from pyspark.sql import Column
-from pyspark.sql.functions import lit
-from typing import Any, Self
+from typing import  Self
 
 def parse_range(range: str) -> dict:
     range = range.strip()
@@ -48,27 +46,13 @@ class Range(BaseModel):
     @model_validator(mode="after")
     def check_range_bounds(self) -> Self:
         if self.start > self.end:
-            raise ValueError("Start value should be less of equal to end")
+            raise ValueError(f"Start value should be less than or equal to end. Got start = {self.start} and end = {self.end}")
         return self
-
-    def contains(self, values: Column) -> Column:
-        start = lit(self.start)
-        end = lit(self.end)
-        if self.include_start and self.include_end:
-            return values.isNotNull() & (values >= start) & (values <= end)
-        if self.include_start:
-            return values.isNotNull() & (values >= start) & (values < end)
-        if self.include_end:
-            return values.isNotNull() & (values > start) & (values <= end)
-        return values.isNotNull() & (values > start) & (values < end)
 
 class RangeDomain(BaseModel):
     type: Literal["range"] = "range"
     value: Range
     description: str | None
-
-    def contains(self, values: Column) -> Column:
-        return self.value.contains(values)
     
 
 class SingleDomain(BaseModel):
@@ -82,10 +66,10 @@ class NullDomain(BaseModel):
     description: str | None
 
 
-Domain = Annotated[RangeDomain, SingleDomain, NullDomain, Field(discriminator="type")]
+Domain = Annotated[RangeDomain | SingleDomain | NullDomain, Field(discriminator="type")]
 
 
-class Variable(BaseModel):
+class AttributeField(BaseModel):
     name: str
     description: str
     domains:  list[Domain]
@@ -94,4 +78,4 @@ class Variable(BaseModel):
 class Table(BaseModel):
     database: str
     name: str
-    variables: list[Variable]
+    variables: list[AttributeField]
