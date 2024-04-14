@@ -1,0 +1,32 @@
+name: Python linting
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.11
+      - name: Install Poetry
+        run: |
+          pip install poetry
+      - name: Configure Poetry
+        run: |
+          poetry config virtualenvs.create false
+      - name: Install dependencies (main and dev)
+        run: |
+          poetry install --with dev
+      - name: Run Flake8
+        run: |
+          poetry run flake8 thundera
+      - name: Run mypy
+        run: |
+          poetry run mypy thundera
