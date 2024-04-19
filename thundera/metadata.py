@@ -1,6 +1,6 @@
 from typing import Annotated, Literal, Self
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 def parse_range(range: str) -> dict:
@@ -36,13 +36,6 @@ class Range(BaseModel):
     include_start: bool
     include_end: bool
 
-    @model_validator(mode="before")
-    @classmethod
-    def parse_interval(cls, range: dict | str) -> dict:
-        if isinstance(range, str):
-            range = parse_range(range)
-        return range
-
     @model_validator(mode="after")
     def check_range_bounds(self) -> Self:
         if self.start > self.end:
@@ -55,8 +48,15 @@ class Range(BaseModel):
 
 class RangeDomain(BaseModel):
     type: Literal["range"] = "range"
-    value: Range
+    value: Range | str
     description: str | None
+
+    @field_validator("value", mode="before")
+    @classmethod
+    def parse_range(cls, range: str | dict) -> Range:
+        if isinstance(range, str):
+            range = parse_range(range)
+        return Range(**range)
 
 
 class SingleDomain(BaseModel):

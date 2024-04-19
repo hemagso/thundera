@@ -1,0 +1,33 @@
+{
+    "data": [
+        -100000000,
+        -100000,
+        -100,
+        -6,
+        -5.0001,
+        -5,
+        -4.9999,
+        0,
+        4.9999,
+        5,
+        5.0001,
+        6,
+        100,
+        100000,
+        100000000,
+        null
+    ],
+    "argnames": [
+        "domain_type", "domain_value"
+    ],
+    "expected": [
+        {"args": { "domain_type": "range", "domain_value": "[-5, 5]"   }, "expected": "0000011111000000"},
+        {"args": { "domain_type": "range", "domain_value": "[(-5, 5]"  }, "expected": "0000001111000000"},
+        {"args": { "domain_type": "range", "domain_value": "[-5, 5)"   }, "expected": "0000011110000000"},
+        {"args": { "domain_type": "range", "domain_value": "(-5, 5)"   }, "expected": "0000001110000000"},
+        {"args": { "domain_type": "range", "domain_value": "(-inf, 5]" }, "expected": "1111111111000000"},
+        {"args": { "domain_type": "range", "domain_value": "(-inf, 5)" }, "expected": "1111111110000000"},
+        {"args": { "domain_type": "range", "domain_value": "[-5, +inf)"}, "expected": "0000011111111111"},
+        {"args": { "domain_type": "range", "domain_value": "(-5, +inf)"}, "expected": "0000001111111111"}
+    ]
+}
