@@ -22,12 +22,12 @@
     ],
     "expected": [
         {"args": { "domain_value": "[-5, 5]"   }, "expected": "0000011111000000"},
-        {"args": { "domain_value": "[(-5, 5]"  }, "expected": "0000001111000000"},
+        {"args": { "domain_value": "(-5, 5]"   }, "expected": "0000001111000000"},
         {"args": { "domain_value": "[-5, 5)"   }, "expected": "0000011110000000"},
         {"args": { "domain_value": "(-5, 5)"   }, "expected": "0000001110000000"},
         {"args": { "domain_value": "(-inf, 5]" }, "expected": "1111111111000000"},
         {"args": { "domain_value": "(-inf, 5)" }, "expected": "1111111110000000"},
-        {"args": { "domain_value": "[-5, +inf)"}, "expected": "0000011111111111"},
-        {"args": { "domain_value": "(-5, +inf)"}, "expected": "0000001111111111"}
+        {"args": { "domain_value": "[-5, +inf)"}, "expected": "0000011111111110"},
+        {"args": { "domain_value": "(-5, +inf)"}, "expected": "0000001111111110"}
     ]
 }

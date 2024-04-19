@@ -22,12 +22,28 @@
     ],
     "expected": [
         {"args": { "domain_type": "range", "domain_value": "[-5, 5]"   }, "expected": "0000011111000000"},
-        {"args": { "domain_type": "range", "domain_value": "[(-5, 5]"  }, "expected": "0000001111000000"},
+        {"args": { "domain_type": "range", "domain_value": "(-5, 5]"  }, "expected": "0000001111000000"},
         {"args": { "domain_type": "range", "domain_value": "[-5, 5)"   }, "expected": "0000011110000000"},
         {"args": { "domain_type": "range", "domain_value": "(-5, 5)"   }, "expected": "0000001110000000"},
         {"args": { "domain_type": "range", "domain_value": "(-inf, 5]" }, "expected": "1111111111000000"},
         {"args": { "domain_type": "range", "domain_value": "(-inf, 5)" }, "expected": "1111111110000000"},
-        {"args": { "domain_type": "range", "domain_value": "[-5, +inf)"}, "expected": "0000011111111111"},
-        {"args": { "domain_type": "range", "domain_value": "(-5, +inf)"}, "expected": "0000001111111111"}
+        {"args": { "domain_type": "range", "domain_value": "[-5, +inf)"}, "expected": "0000011111111110"},
+        {"args": { "domain_type": "range", "domain_value": "(-5, +inf)"}, "expected": "0000001111111110"},
+        {"args": { "domain_type": "single", "domain_value": -100000000     }, "expected": "1000000000000000"},
+        {"args": { "domain_type": "single", "domain_value": -100000        }, "expected": "0100000000000000"},
+        {"args": { "domain_type": "single", "domain_value": -100           }, "expected": "0010000000000000"},
+        {"args": { "domain_type": "single", "domain_value": -6             }, "expected": "0001000000000000"},
+        {"args": { "domain_type": "single", "domain_value": -5.0001        }, "expected": "0000100000000000"},
+        {"args": { "domain_type": "single", "domain_value": -5             }, "expected": "0000010000000000"},
+        {"args": { "domain_type": "single", "domain_value": -4.9999        }, "expected": "0000001000000000"},
+        {"args": { "domain_type": "single", "domain_value": 0              }, "expected": "0000000100000000"},
+        {"args": { "domain_type": "single", "domain_value": 4.9999         }, "expected": "0000000010000000"},
+        {"args": { "domain_type": "single", "domain_value": 5              }, "expected": "0000000001000000"},
+        {"args": { "domain_type": "single", "domain_value": 5.0001         }, "expected": "0000000000100000"},
+        {"args": { "domain_type": "single", "domain_value": 6              }, "expected": "0000000000010000"},
+        {"args": { "domain_type": "single", "domain_value": 100            }, "expected": "0000000000001000"},
+        {"args": { "domain_type": "single", "domain_value": 100000         }, "expected": "0000000000000100"},
+        {"args": { "domain_type": "single", "domain_value": 100000000      }, "expected": "0000000000000010"},
+        {"args": { "domain_type": "null", "domain_value": null             }, "expected": "0000000000000001"}
     ]
 }

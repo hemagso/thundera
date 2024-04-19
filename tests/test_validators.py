@@ -1,4 +1,5 @@
 import json
+from itertools import cycle
 from typing import Generator, Literal
 
 import pytest
@@ -44,10 +45,9 @@ def parametrize_from_file(filename: str):
         expected = [bool_from_str(item["expected"]) for item in specs["expected"]]
 
         argnames = ", ".join(specs["argnames"]) + ", values, expected"
+        argvalues = list(zip(*args.values(), cycle([specs["data"]]), expected))
 
-        return pytest.mark.parametrize(
-            argnames=argnames, argvalues=zip(*args.values(), [specs["data"]], expected)
-        )(func)
+        return pytest.mark.parametrize(argnames=argnames, argvalues=argvalues)(func)
 
     return decorator
 
@@ -108,11 +108,6 @@ def test_null_domain_contains(spark: SparkSession, values: list[float], expected
 
     results = data.withColumn("results", null_domain_contains()(col("value")))
     assert [row.results for row in results.collect()] == expected
-
-
-domain_test_cases = [
-    ("single",) + test_case for test_case in single_domain_test_cases
-] + [("null", None) + test_case for test_case in null_domain_test_cases]
 
 
 @parametrize_from_file("./tests/fixtures/data/domain_contains.json")
