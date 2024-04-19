@@ -48,7 +48,7 @@ class Range(BaseModel):
 
 class RangeDomain(BaseModel):
     type: Literal["range"] = "range"
-    value: Range | str
+    value: Range
     description: str | None
 
     @field_validator("value", mode="before")
