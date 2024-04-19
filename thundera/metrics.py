@@ -1,4 +1,4 @@
-from pyspark.sql import Column, DataFrame
+from pyspark.sql import DataFrame
 from pyspark.sql.functions import col, histogram_numeric, lit, percentile_approx
 
 from .metadata import AttributeField
