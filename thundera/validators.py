@@ -143,3 +143,17 @@ def domain_selector(field: AttributeField) -> DomainTransformer:
         return results
 
     return transformer
+
+
+def is_range_domain(field: AttributeField) -> DomainValidator:
+    def validator(values: Column) -> Column:
+        return reduce(
+            lambda a, b: a | b,
+            [
+                domain_contains(domain)(values)
+                for domain in field.domains
+                if isinstance(domain, RangeDomain)
+            ],
+        )
+
+    return validator
