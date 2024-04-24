@@ -111,6 +111,21 @@ def get_field_percentiles(
 
 
 def get_field_histogram(df_distribution: DataFrame) -> DataFrame:
+    """This function 'explodes' the histogram field in the df_distribution, changing
+    its schema into a schema of only atomic and immutable types (No arrays/objects).
+
+    Args:
+        df_distribution (DataFrame): The input dataframe. See the documentation of
+            get_field_distribution for its schema.
+
+    Returns:
+        DataFrame: The 'exploded' dataframe. See below for its schema.
+
+    Schemas:
+        Output: This dataframe will have a line for each 'attribute', 'domain' and
+        'bin'. There will also be a 'value' and a 'count' field. Each row represents an
+        histogram bar for an attribute and domain.
+    """
     window_spec = Window.partitionBy("attribute", "domain").orderBy("exploded.x")
     return (
         df_distribution.select("attribute", "domain", "histogram")
