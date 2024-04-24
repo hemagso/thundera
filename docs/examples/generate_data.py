@@ -23,7 +23,7 @@ def generate_var_b(size: int) -> list[float]:
 
 def generate_var_c(size: int) -> list[float | None]:
     kind = choices(
-        [lambda: lognormvariate(3, 2), lambda: -8.0, lambda: -9.0, lambda: None],
+        [lambda: lognormvariate(3, 0.5), lambda: -8.0, lambda: -9.0, lambda: None],
         weights=[80, 15, 4, 1],
         k=size,
     )

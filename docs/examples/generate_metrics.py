@@ -1,7 +1,8 @@
+import json
+from pprint import pprint
+
 from generate_data import generate
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, explode, lit, row_number, stack
-from pyspark.sql.window import Window
 
 from thundera.metadata import Table
 from thundera.metrics import generate_table_metrics
@@ -24,11 +25,11 @@ def main():
     data = generate(spark, 10_000)
 
     table = Table.from_yaml("./docs/examples/metadata.yml")
-    df_counts, df_histogram, df_percentile = generate_table_metrics(data, table)
+    metric_data = generate_table_metrics(data, table)
 
-    df_counts.show()
-    df_histogram.show()
-    df_percentile.show()
+    pprint(metric_data, compact=True)
+    with open("output.json", "w", encoding="utf-8") as file:
+        json.dump(metric_data, file)
 
 
 if __name__ == "__main__":

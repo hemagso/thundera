@@ -4,12 +4,14 @@ from typing import TypedDict
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import (
     col,
+    collect_list,
     explode,
     histogram_numeric,
     lit,
     percentile_approx,
     row_number,
     stack,
+    struct,
 )
 from pyspark.sql.window import Window
 
@@ -18,6 +20,17 @@ from .validators import domain_selector, is_range_domain
 
 
 def get_domain_counts(df: DataFrame) -> DataFrame:
+    """Generate a dataset with the count of each domain
+
+    TODO: Merge back with the list of valid domains to detect domains with no counts
+
+    Args:
+        df (DataFrame): Dataframe with a 'domain' field already calculated identifying
+            each domain.
+
+    Returns:
+        DataFrame: Dataframe with the domain counts.
+    """
     return df.groupBy("domain").count()
 
 
@@ -72,15 +85,51 @@ def get_field_distribution(
     return df_counts, df_histogram, df_percentile
 
 
-class CountData(TypedDict):
-    attribute: str
-    domain: str
-    count: int
+def format_counts(df: DataFrame):
+    grouped_df = df.groupBy("attribute").agg(
+        collect_list(struct("domain", "count")).alias("domain_counts")
+    )
+
+    return {
+        row["attribute"]: [(r["domain"], r["count"]) for r in row["domain_counts"]]
+        for row in grouped_df.collect()
+    }
 
 
-def format_counts(df: DataFrame) -> list[CountData]:
-    names = ("attribute", "domain", "count")
-    return [dict(zip(names, tuple(row))) for row in df.select(*names).collect()]
+def format_histograms(df: DataFrame):
+    grouped_df = df.groupBy("attribute", "domain").agg(
+        collect_list(struct("bin", "value", "count")).alias("bin_counts")
+    )
+    result = {}
+    for row in grouped_df.collect():
+        attribute = row["attribute"]
+        domain = row["domain"]
+        counts = [(r["bin"], r["value"], r["count"]) for r in row["bin_counts"]]
+
+        if attribute not in result:
+            result[attribute] = {}
+
+        result[attribute][domain] = counts
+
+    return result
+
+
+def format_percentiles(df: DataFrame):
+    grouped_df = df.groupBy("attribute", "domain").agg(
+        collect_list(struct("percentile", "value")).alias("pctl_values")
+    )
+    result = {}
+    for row in grouped_df.collect():
+        attribute = row["attribute"]
+        domain = row["domain"]
+        counts = [(r["percentile"], r["value"]) for r in row["pctl_values"]]
+
+        if attribute not in result:
+            result[attribute] = {}
+
+        result[attribute][domain] = counts
+
+    return result
 
 
 def generate_table_metrics(df: DataFrame, table: Table):
@@ -91,4 +140,15 @@ def generate_table_metrics(df: DataFrame, table: Table):
     df_histogram = reduce(DataFrame.unionByName, histogram)
     df_percentiles = reduce(DataFrame.unionByName, percentiles)
 
-    return df_counts, df_histogram, df_percentiles
+    data_counts = format_counts(df_counts)
+    data_histograms = format_histograms(df_histogram)
+    data_percentiles = format_percentiles(df_percentiles)
+
+    return {
+        attribute.name: {
+            "histogram": data_histograms[attribute.name],
+            "count": data_counts[attribute.name],
+            "percentile": data_percentiles[attribute.name],
+        }
+        for attribute in table.attributes
+    }

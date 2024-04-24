@@ -8,44 +8,52 @@ attributes:
         id: missing
         description: Missing Data
       - type: single
-        id: Zero Division
+        id: flag_m99
         value: -99.0
         description: Flag -99
       - type: single
-        id: No Product
+        id: flag_m999
         value: -999.0
         description: Flag -999
       - type: range
-        id: Nice
+        id: values
         value: "[0, +inf)"
         description: Positives
   - name: var_b
     description: Variable B
     domains:
       - type: range
-        id: Percentage
-        value: "(-100, 100)"
-        description: Percentage change
+        id: negatives
+        value: "(-100, 0)"
+        description: Negative change
       - type: single
-        id: Zero Division
+        id: zero
+        value: 0
+        description: No change
+      - type: range
+        id: positives
+        value: "(0, 100)"
+        description: Positive change
+      - type: single
+        id: flag_m101
         value: -101
         description: Flag -101
       - type: single
-        id: No product
+        id: flag_m201
         value: -201
         description: Flag -201
   - name: var_c
     description: Variable C
     domains:
       - type: range
-        id: Income
+        id: income
         value: "(0, +inf)"
         description: Income value
       - type: single
-        id: Grant
+        id: flag_m9
         value: -9
         description: Flag -9
       - type: single
-        id: Rage
+        id: flag_m8
         value: -8
         description: Flag -8
