@@ -39,6 +39,30 @@ def get_field_distribution(
     percentiles: tuple[int, ...],
     n_bins: int,
 ) -> DataFrame:
+    """Generate a dataframe with data about the univariate distribution properties of
+    all domain classes of a field.
+
+    Args:
+        df_ranges (DataFrame): The input dataframe. See below for its expected schema.
+        field (AttributeField): The field being analyzed.
+        percentiles (tuple[int, ...]): Tuple containing the percentiles we wish to
+            calculate for this variable.
+        n_bins (int): Number of bins to use for histogram calculation.
+
+    Returns:
+        DataFrame: Output dataframe. See below for its schema.
+
+    Schemas:
+        Input: The input dataframe must have two columns. One column must be named
+            'raw', and contains the original values of the field. The other column
+            must be named 'domain', and contain the domain class id associated with
+            that value (or __INVALID__ for invalid domains).
+
+        Output: The output dataframe will have a line for each domain encountered in
+            the data, identified by the 'domain' column (Primary key). There will be
+            a column of type float/double for each percentile value, named
+            pctl_{percentile} and an array of rows field with the histogram data.
+    """
     return (
         df_ranges.groupBy("domain")
         .agg(
