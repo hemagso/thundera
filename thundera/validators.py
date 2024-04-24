@@ -134,11 +134,9 @@ def domain_selector(field: AttributeField) -> DomainTransformer:
 
     def transformer(values: Column) -> Column:
         domain = field.domains[0]
-        results = when(domain_contains(domain)(values), lit(domain.description))
+        results = when(domain_contains(domain)(values), lit(domain.id))
         for domain in field.domains[1:]:
-            results = results.when(
-                domain_contains(domain)(values), lit(domain.description)
-            )
+            results = results.when(domain_contains(domain)(values), lit(domain.id))
         results = results.otherwise(lit("__INVALID__"))
         return results
 

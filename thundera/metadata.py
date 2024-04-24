@@ -49,6 +49,7 @@ class Range(BaseModel):
 
 class RangeDomain(BaseModel):
     type: Literal["range"] = "range"
+    id: str
     value: Range
     description: str | None
 
@@ -62,11 +63,13 @@ class RangeDomain(BaseModel):
 
 class SingleDomain(BaseModel):
     type: Literal["single"] = "single"
+    id: str
     value: Annotated[int | float | str, Field(union_mode="smart")]
     description: str | None
 
 
 class NullDomain(BaseModel):
+    id: str
     type: Literal["null"] = "null"
     description: str | None
 
