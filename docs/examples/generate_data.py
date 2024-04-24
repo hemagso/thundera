@@ -21,9 +21,19 @@ def generate_var_b(size: int) -> list[float]:
     return [f() for f in kind]
 
 
+def generate_var_c(size: int) -> list[float | None]:
+    kind = choices(
+        [lambda: lognormvariate(3, 2), lambda: -8.0, lambda: -9.0, lambda: None],
+        weights=[80, 15, 4, 1],
+        k=size,
+    )
+    return [f() for f in kind]
+
+
 def generate(spark: SparkSession, size: int) -> DataFrame:
     var_a = generate_var_a(size)
     var_b = generate_var_b(size)
+    var_c = generate_var_c(size)
 
-    df = spark.createDataFrame(zip(var_a, var_b), ("var_a", "var_b"))
+    df = spark.createDataFrame(zip(var_a, var_b, var_c), ("var_a", "var_b", "var_c"))
     return df
