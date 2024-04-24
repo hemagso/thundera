@@ -1,6 +1,7 @@
 from typing import Annotated, Literal, Self
 
 from pydantic import BaseModel, Field, field_validator, model_validator
+from yaml import safe_load
 
 
 def parse_range(range: str) -> dict:
@@ -82,4 +83,10 @@ class AttributeField(BaseModel):
 class Table(BaseModel):
     database: str
     name: str
-    variables: list[AttributeField]
+    attributes: list[AttributeField]
+
+    @classmethod
+    def from_yaml(cls: type[Self], path: str) -> Self:
+        with open(path, "r", encoding="utf-8") as file:
+            d = safe_load(file)
+            return cls(**d)
