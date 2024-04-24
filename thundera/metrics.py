@@ -1,5 +1,4 @@
 from functools import reduce
-from typing import TypedDict
 
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import (
@@ -35,41 +34,41 @@ def get_domain_counts(df: DataFrame) -> DataFrame:
 
 
 def get_field_distribution(
-    df: DataFrame, field: AttributeField, percentiles=(0, 20, 40, 60, 80, 100)
-):
-    df_domains = df.select(
-        col(field.name).alias("raw"),
-        domain_selector(field)(col(field.name)).alias("domain"),
-    )
-
-    df_counts = get_domain_counts(df_domains).withColumn("attribute", lit(field.name))
-
-    df_ranges = df_domains.filter(is_range_domain(field)(col("raw")))
-
-    df_distribution = (
+    df_ranges: DataFrame,
+    field: AttributeField,
+    percentiles: tuple[int, ...],
+    n_bins: int,
+) -> DataFrame:
+    return (
         df_ranges.groupBy("domain")
         .agg(
             *[
                 percentile_approx("raw", percentile / 100).alias(f"pctl_{percentile}")
                 for percentile in percentiles
             ]
-            + [histogram_numeric("raw", lit(30)).alias("histogram")]
+            + [histogram_numeric("raw", lit(n_bins)).alias("histogram")]
         )
         .withColumn("attribute", lit(field.name))
     )
 
-    stack_args = []
-    for p in percentiles:
-        stack_args.extend([lit(p), f"pctl_{p}"])
 
-    df_percentile = df_distribution.select(
+def get_field_percentiles(
+    df_distribution: DataFrame, percentiles: tuple[int, ...]
+) -> DataFrame:
+    stack_args = [lit(len(percentiles))]
+    for p in percentiles:
+        stack_args.extend([lit(p), col(f"pctl_{p}")])
+
+    return df_distribution.select(
         "attribute",
         "domain",
-        stack(lit(len(percentiles)), *stack_args).alias("percentile", "value"),
+        stack(*stack_args).alias("percentile", "value"),
     )
 
+
+def get_field_histogram(df_distribution: DataFrame) -> DataFrame:
     window_spec = Window.partitionBy("attribute", "domain").orderBy("exploded.x")
-    df_histogram = (
+    return (
         df_distribution.select("attribute", "domain", "histogram")
         .withColumn("exploded", explode(col("histogram")))
         .withColumn("bin", row_number().over(window_spec))
@@ -81,6 +80,24 @@ def get_field_distribution(
             col("exploded.y").alias("count"),
         )
     )
+
+
+def get_field_metrics(
+    df: DataFrame,
+    field: AttributeField,
+    percentiles: tuple[int, ...] = (0, 1, 5, 10, 25, 50, 75, 90, 95, 99, 100),
+    n_bins: int = 30,
+):
+    df_domains = df.select(
+        col(field.name).alias("raw"),
+        domain_selector(field)(col(field.name)).alias("domain"),
+    )
+
+    df_counts = get_domain_counts(df_domains).withColumn("attribute", lit(field.name))
+    df_ranges = df_domains.filter(is_range_domain(field)(col("raw")))
+    df_distribution = get_field_distribution(df_ranges, field, percentiles, n_bins)
+    df_percentile = get_field_percentiles(df_distribution, percentiles)
+    df_histogram = get_field_histogram(df_distribution)
 
     return df_counts, df_histogram, df_percentile
 
@@ -96,11 +113,16 @@ def format_counts(df: DataFrame):
     }
 
 
-def format_histograms(df: DataFrame):
+HistogramEntry = tuple[int, float, int]
+DomainHistogram = list[HistogramEntry]
+Histograms = dict[str, dict[str, DomainHistogram]]
+
+
+def format_histograms(df: DataFrame) -> Histograms:
     grouped_df = df.groupBy("attribute", "domain").agg(
         collect_list(struct("bin", "value", "count")).alias("bin_counts")
     )
-    result = {}
+    result: Histograms = {}
     for row in grouped_df.collect():
         attribute = row["attribute"]
         domain = row["domain"]
@@ -114,11 +136,16 @@ def format_histograms(df: DataFrame):
     return result
 
 
-def format_percentiles(df: DataFrame):
+PercentileEntry = tuple[int, float]
+DomainPercentiles = list[PercentileEntry]
+Percentiles = dict[str, dict[str, DomainPercentiles]]
+
+
+def format_percentiles(df: DataFrame) -> Percentiles:
     grouped_df = df.groupBy("attribute", "domain").agg(
         collect_list(struct("percentile", "value")).alias("pctl_values")
     )
-    result = {}
+    result: Percentiles = {}
     for row in grouped_df.collect():
         attribute = row["attribute"]
         domain = row["domain"]
@@ -134,7 +161,7 @@ def format_percentiles(df: DataFrame):
 
 def generate_table_metrics(df: DataFrame, table: Table):
     counts, histogram, percentiles = zip(
-        *[get_field_distribution(df, attribute) for attribute in table.attributes]
+        *[get_field_metrics(df, attribute) for attribute in table.attributes]
     )
     df_counts = reduce(DataFrame.unionByName, counts)
     df_histogram = reduce(DataFrame.unionByName, histogram)
