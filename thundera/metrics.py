@@ -56,7 +56,8 @@ def get_field_distribution(
         Input: The input dataframe must have two columns. One column must be named
             'raw', and contains the original values of the field. The other column
             must be named 'domain', and contain the domain class id associated with
-            that value (or __INVALID__ for invalid domains).
+            that value. Only range domains should be passed to this function. It will
+            still work with other types of domain, but the calculation will be moot.
 
         Output: The output dataframe will have a line for each domain encountered in
             the data, identified by the 'domain' column (Primary key). There will be
@@ -79,6 +80,25 @@ def get_field_distribution(
 def get_field_percentiles(
     df_distribution: DataFrame, percentiles: tuple[int, ...]
 ) -> DataFrame:
+    """This function transposes the distribution dataframe (See get_field_distribution)
+    to get it into a fixed schema that is independent of the number of percentiles
+    calculated.
+
+
+    Args:
+        df_distribution (DataFrame): The input dataframe. See the documentation for
+            get_field_distribution for its schema.
+        percentiles (tuple[int, ...]): The percentiles that need to be calculated.
+
+    Returns:
+        DataFrame: The transposed dataframe. See below for its schema.
+
+    Schemas:
+        Output: This dataframe will have a line for each 'attribute', 'domain' and
+        'percentile', which are also the primary key of the dataframe. Each row
+        represents a single percentile of a single domain class in a field. The column
+        'value' contains the actual percentile value.
+    """
     stack_args = [lit(len(percentiles))]
     for p in percentiles:
         stack_args.extend([lit(p), col(f"pctl_{p}")])
