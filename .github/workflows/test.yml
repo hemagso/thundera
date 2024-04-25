@@ -1,0 +1,17 @@
+name: Testing
+on:
+  push:
+    branches: main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/hemagso/thundera:python3.11
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Run tests
+        run: poetry run pytest
