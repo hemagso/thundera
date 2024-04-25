@@ -1,4 +1,5 @@
 from functools import reduce
+from typing import TypedDict
 
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import (
@@ -176,7 +177,23 @@ def get_field_metrics(
     return df_counts, df_histogram, df_percentile
 
 
-def format_counts(df: DataFrame):
+CountEntry = tuple[str, int]
+DomainCounts = list[CountEntry]
+Counts = dict[str, DomainCounts]
+
+
+def format_counts(df: DataFrame) -> Counts:
+    """Converts the data from a count dataframe into an dictionary.
+
+    Args:
+        df (DataFrame): The counts dataframe. See get_domain_count for details on
+            its schema.
+
+    Returns:
+        Counts: Dictionary of the counts. This dictionary will have an entry for
+            every field, which will contain a list of 'domain', 'count' tuples
+            with the data.
+    """
     grouped_df = df.groupBy("attribute").agg(
         collect_list(struct("domain", "count")).alias("domain_counts")
     )
@@ -193,6 +210,18 @@ Histograms = dict[str, dict[str, DomainHistogram]]
 
 
 def format_histograms(df: DataFrame) -> Histograms:
+    """Converts the data from an histogram dataframe into an dictionary.
+
+    Args:
+        df (DataFrame): The histogram dataframe. See get_field_histogram for details on
+            its schema.
+
+    Returns:
+        Histograms: Dictionary of the histograms. This dictionary will have an entry for
+            everyfield, which in turn will contain a dictionary with an entry for every
+            domain. This entry will consist of an 'bin', 'value', 'count' tuple with
+            the data for the histogram.
+    """
     grouped_df = df.groupBy("attribute", "domain").agg(
         collect_list(struct("bin", "value", "count")).alias("bin_counts")
     )
@@ -216,6 +245,18 @@ Percentiles = dict[str, dict[str, DomainPercentiles]]
 
 
 def format_percentiles(df: DataFrame) -> Percentiles:
+    """Converts the data from the histogram dataframe into a dictionary.
+
+    Args:
+        df (DataFrame): The percentile dataframe. See get_field_percentiles for details
+            on its schema.
+
+    Returns:
+        Percentiles: Dictionary of the percentiles. It will contain and entry for each
+            field, which will be another dictionary. This dictionary will contain and
+            entry for each domain, which will contain a list of 'percentile', 'value'
+            tuples that will contain the percentile data.
+    """
     grouped_df = df.groupBy("attribute", "domain").agg(
         collect_list(struct("percentile", "value")).alias("pctl_values")
     )
@@ -233,7 +274,25 @@ def format_percentiles(df: DataFrame) -> Percentiles:
     return result
 
 
-def generate_table_metrics(df: DataFrame, table: Table):
+class AttributeData(TypedDict):
+    histogram: dict[str, DomainHistogram]
+    count: DomainCounts
+    percentile: dict[str, DomainPercentiles]
+
+
+TableData = dict[str, AttributeData]
+
+
+def generate_table_metrics(df: DataFrame, table: Table) -> TableData:
+    """Generates all metrics for a table.
+
+    Args:
+        df (DataFrame): The input dataset.
+        table (Table): The Table metadata object.
+
+    Returns:
+        TableData: Dictionary containing all metrics for the table.
+    """
     counts, histogram, percentiles = zip(
         *[get_field_metrics(df, attribute) for attribute in table.attributes]
     )
