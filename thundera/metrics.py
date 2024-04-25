@@ -146,7 +146,22 @@ def get_field_metrics(
     field: AttributeField,
     percentiles: tuple[int, ...] = (0, 1, 5, 10, 25, 50, 75, 90, 95, 99, 100),
     n_bins: int = 30,
-):
+) -> tuple[DataFrame, DataFrame, DataFrame]:
+    """Generates the univariate distribution metrics for a single field in a dataframe.
+
+    Args:
+        df (DataFrame): The input dataframe.
+        field (AttributeField): The field we wish to calculate the metrics from.
+        percentiles (tuple[int, ...], optional): Tuple containing the percentile values
+        to calculate. Defaults to (0, 1, 5, 10, 25, 50, 75, 90, 95, 99, 100).
+        n_bins (int, optional): The number of bins to calculate the histogram. Defaults
+            to 30.
+
+    Returns:
+        tuple[DataFrame, DataFrame, DataFrame]: Tuple containing the counts, histogram
+            and percentile dataframes. See the documentation for get_domain_counts,
+            get_field_histogram and get_field_percentiles for their schema.
+    """
     df_domains = df.select(
         col(field.name).alias("raw"),
         domain_selector(field)(col(field.name)).alias("domain"),
