@@ -17,9 +17,3 @@ RUN python3 -m venv $POETRY_HOME && \
 ENV PATH="$POETRY_HOME/bin:$PATH"
 
 WORKDIR /app
-
-COPY pyproject.toml ./
-
-RUN poetry install --only main,test --no-root
-
-COPY . ./
