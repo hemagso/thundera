@@ -72,7 +72,7 @@ def test_range_domain_contains(
     spark: SparkSession, domain_value: str, values: list[float], expected: list[bool]
 ):
     data = df_from_list(spark, values)
-    domain = RangeDomain(description="Test Range", value=domain_value)
+    domain = RangeDomain(description="Test Range", value=domain_value, id="range")
 
     results = data.withColumn("results", range_domain_contains(domain)(col("value")))
 
@@ -90,7 +90,7 @@ def test_single_domain_contains(
 ):
     data = df_from_list(spark, values)
 
-    domain = SingleDomain(description="Test Single", value=domain_value)
+    domain = SingleDomain(description="Test Single", value=domain_value, id="single")
 
     results = data.withColumn("results", single_domain_contains(domain)(col("value")))
 
@@ -122,11 +122,13 @@ def test_domain_contains(
 
     domain: Domain
     if domain_type == "range":
-        domain = RangeDomain(description="Test Range", value=domain_value)
+        domain = RangeDomain(description="Test Range", value=domain_value, id="range")
     elif domain_type == "single":
-        domain = SingleDomain(description="Test Single", value=domain_value)
+        domain = SingleDomain(
+            description="Test Single", value=domain_value, id="single"
+        )
     elif domain_type == "null":
-        domain = NullDomain(description="Test Null")
+        domain = NullDomain(description="Test Null", id="null")
 
     results = data.withColumn("results", domain_contains(domain)(col("value")))
 
@@ -164,11 +166,11 @@ def test_domain_contains(
     ],
 )
 def test_domain_validator(spark: SparkSession, values: list[float], expected: str):
-    range_1 = RangeDomain(description="Range 1", value="(0, 1]")
-    range_2 = RangeDomain(description="Range 2", value="[100, 200)")
-    value_1 = SingleDomain(description="Value 1", value=50)
-    value_2 = SingleDomain(description="Value 2", value=-5)
-    value_3 = NullDomain(description="Null domain")
+    range_1 = RangeDomain(description="Range 1", value="(0, 1]", id="range_1")
+    range_2 = RangeDomain(description="Range 2", value="[100, 200)", id="range_2")
+    value_1 = SingleDomain(description="Value 1", value=50, id="value_1")
+    value_2 = SingleDomain(description="Value 2", value=-5, id="value_2")
+    value_3 = NullDomain(description="Null domain", id="value_3")
 
     field = AttributeField(
         name="Test Field",
