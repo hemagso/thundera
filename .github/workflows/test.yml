@@ -5,7 +5,9 @@ on:
 
 jobs:
   test:
-    runs-on: ghcr.io/hemagso/thundera:python3.11
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/hemagso/thundera:python3.11
 
     steps:
       - name: Checkout Repository
