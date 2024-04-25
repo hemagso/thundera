@@ -5,13 +5,14 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/hemagso/thundera:python3.11
+    runs-on: ghcr.io/hemagso/thundera:python3.11
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
+
+      - name: Install module
+        run: poetry install --only-root
 
       - name: Run tests
         run: poetry run pytest

@@ -23,7 +23,3 @@ COPY pyproject.toml ./
 RUN poetry install --only main,test --no-root
 
 COPY . ./
-
-RUN poetry install --only-root
-
-CMD ["poetry", "run", "pytest"]
