@@ -5,6 +5,18 @@ from yaml import safe_load
 
 
 def parse_range(range: str) -> dict:
+    """_summary_
+
+    Args:
+        range (str): _description_
+
+    Raises:
+        ValueError: _description_
+        ValueError: _description_
+
+    Returns:
+        dict: _description_
+    """
     range = range.strip()
 
     open_range = range[0]
