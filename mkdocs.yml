@@ -13,7 +13,11 @@ nav:
     - thundera: reference/
 
 plugins:
-  - mkdocstrings
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            group_by_category: true
   - gen-files:
       scripts:
         - scripts/gen_ref_nav.py
