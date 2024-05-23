@@ -1,3 +1,9 @@
+""" generators.py
+
+Contains functions that generate valid values from a Field specification. Useful when
+simulating data for testing.
+"""
+
 from math import isinf
 from random import choice, uniform
 
