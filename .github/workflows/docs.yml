@@ -41,7 +41,7 @@ jobs:
 
       - name: Install docs dependencies
         run: |
-          poetry install --with docs --no-root
+          poetry install --only docs
 
       - name: Build mkdocs
         run: |
