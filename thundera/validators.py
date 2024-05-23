@@ -118,7 +118,7 @@ def domain_validator(field: AttributeField) -> DomainValidator:
 
 
 def domain_selector(field: AttributeField) -> DomainTransformer:
-    """Returns a function that builds a spark expression that calculated which
+    """Returns a function that builds a spark expression that calculates which
     sub-domain of an Attribute Field each value of a Column belongs to.
 
     Args:
@@ -144,6 +144,17 @@ def domain_selector(field: AttributeField) -> DomainTransformer:
 
 
 def is_range_domain(field: AttributeField) -> DomainValidator:
+    """Returns a function that builds a spark expression that calculates whether or
+    not values in a column belong to a range domain of an attribute field.
+
+    Args:
+        field (AttributeField): The attribute field being tested against.
+
+    Returns:
+        DomainValidator: A function that returns a spark expression that tests whether
+            or not values of a column belong to any range domain of the field.
+    """
+
     def validator(values: Column) -> Column:
         return reduce(
             lambda a, b: a | b,
