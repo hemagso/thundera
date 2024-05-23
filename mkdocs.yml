@@ -1,3 +1,21 @@
 site_name: Thundera Documentation
 theme:
   name: material
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+
+nav:
+  - Home:
+    - Overview: index.md
+  - API reference:
+    - thundera: reference/
+
+plugins:
+  - mkdocstrings
+  - gen-files:
+      scripts:
+        - scripts/gen_ref_nav.py
+  - literate-nav:
+      nav_file: SUMMARY.md

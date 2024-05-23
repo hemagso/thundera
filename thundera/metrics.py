@@ -154,7 +154,7 @@ def get_field_metrics(
         df (DataFrame): The input dataframe.
         field (AttributeField): The field we wish to calculate the metrics from.
         percentiles (tuple[int, ...], optional): Tuple containing the percentile values
-        to calculate. Defaults to (0, 1, 5, 10, 25, 50, 75, 90, 95, 99, 100).
+            to calculate. Defaults to (0, 1, 5, 10, 25, 50, 75, 90, 95, 99, 100).
         n_bins (int, optional): The number of bins to calculate the histogram. Defaults
             to 30.
 

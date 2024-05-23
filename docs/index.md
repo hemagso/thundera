@@ -16,5 +16,3 @@ large datasets.
 the metrics and data generated.
 
 ## Thundera Examples
-
-
