@@ -275,6 +275,8 @@ def format_percentiles(df: DataFrame) -> Percentiles:
 
 
 class AttributeData(TypedDict):
+    """Dictionary containing all the data generated from an Attribute Field."""
+
     histogram: dict[str, DomainHistogram]
     count: DomainCounts
     percentile: dict[str, DomainPercentiles]
