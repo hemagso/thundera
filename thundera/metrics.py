@@ -166,13 +166,19 @@ def get_field_metrics(
     df_domains = df.select(
         col(field.name).alias("raw"),
         domain_selector(field)(col(field.name)).alias("domain"),
-    )
+    ).cache()
 
     df_counts = get_domain_counts(df_domains).withColumn("attribute", lit(field.name))
-    df_ranges = df_domains.filter(is_range_domain(field)(col("raw")))
-    df_distribution = get_field_distribution(df_ranges, field, percentiles, n_bins)
+    df_ranges = df_domains.filter(is_range_domain(field)(col("raw"))).cache()
+    df_distribution = get_field_distribution(
+        df_ranges, field, percentiles, n_bins
+    ).cache()
     df_percentile = get_field_percentiles(df_distribution, percentiles)
     df_histogram = get_field_histogram(df_distribution)
+
+    df_domains.unpersist()
+    df_ranges.unpersist()
+    df_distribution.unpersist()
 
     return df_counts, df_histogram, df_percentile
 
