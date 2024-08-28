@@ -57,3 +57,13 @@ attributes:
         id: flag_m8
         value: -8
         description: Flag -8
+  - name: var_d
+    description: Variable D
+    domains:
+      - type: "null"
+        id: missing
+        description: Missing Data
+      - type: range
+        id: values
+        value: "(-inf, +inf)"
+        description: Positives

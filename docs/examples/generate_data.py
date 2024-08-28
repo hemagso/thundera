@@ -3,9 +3,9 @@ from random import choices, lognormvariate, normalvariate, uniform
 from pyspark.sql import DataFrame, SparkSession
 
 
-def generate_var_a(size: int) -> list[float | None]:
+def generate_var_a(size: int, mu: float, sigma: float) -> list[float | None]:
     kind = choices(
-        [lambda: None, lambda: -99.0, lambda: -999.0, lambda: normalvariate(100, 10)],
+        [lambda: None, lambda: -99.0, lambda: -999.0, lambda: normalvariate(mu, sigma)],
         weights=[5, 10, 10, 75],
         k=size,
     )
@@ -30,10 +30,22 @@ def generate_var_c(size: int) -> list[float | None]:
     return [f() for f in kind]
 
 
-def generate(spark: SparkSession, size: int) -> DataFrame:
-    var_a = generate_var_a(size)
+def generate_var_d(size: int, mu: float, sigma: float) -> list[float | None]:
+    kind = choices(
+        [lambda: None, lambda: -99.0, lambda: -999.0, lambda: normalvariate(mu, sigma)],
+        weights=[10, 10, 65, 15],
+        k=size,
+    )
+    return [f() for f in kind]
+
+
+def generate(spark: SparkSession, size: int, mu: float, sigma: float) -> DataFrame:
+    var_a = generate_var_a(size, mu, sigma)
     var_b = generate_var_b(size)
     var_c = generate_var_c(size)
+    var_d = generate_var_d(size, mu, sigma)
 
-    df = spark.createDataFrame(zip(var_a, var_b, var_c), ("var_a", "var_b", "var_c"))
+    df = spark.createDataFrame(
+        zip(var_a, var_b, var_c, var_d), ("var_a", "var_b", "var_c", "var_d")
+    )
     return df
